@@ -31,8 +31,13 @@ app.get('/:page.html', (req, res) => {
 		}
 	});
 })
-app.get('/oauth-redirect', (req, res) => {
-	console.log('/oauth-redirect')
+app.get('/oauthRedirect', (req, res) => {
+	console.log('/oauth-redirect: code=', req.params['code'], 'userState=', req.params['userState'])
+	// What we get back:
+	// code: the authorization code
+	// userState: either Authenticated or AuthenticatedNotRegistered
+
+	res.end('You have authenticated')
 })
 
 app.listen(port, () => {
