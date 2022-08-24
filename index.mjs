@@ -32,10 +32,12 @@ app.get('/:page.html', (req, res) => {
 	});
 })
 app.get('/oauthRedirect', (req, res) => {
-	console.log('/oauth-redirect: code=', req.params['code'], 'userState=', req.params['userState'])
+	console.log('/oauth-redirect: code=', req.query['code'], 'userState=', req.query['userState'])
 	// What we get back:
 	// code: the authorization code
 	// userState: either Authenticated or AuthenticatedNotRegistered
+	let code = req.query['code']
+	let userState = req.query['userState']
 
 	res.end('You have authenticated')
 })
