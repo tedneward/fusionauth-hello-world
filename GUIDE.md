@@ -108,12 +108,13 @@ When the user clicks that "log in" link, FusionAuth takes over and presents the 
 
 ```js
 app.get('/oauthRedirect', (req, res) => {
-	console.log('/oauth-redirect: code=', req.query['code'], 'userState=', req.query['userState'])
 	// What we get back:
 	// code: the authorization code
 	// userState: either Authenticated or AuthenticatedNotRegistered
 	let code = req.query['code']
 	let userState = req.query['userState']
+
+	console.log('/oauthRedirect: code=', code, 'userState=', userState)
 
 	res.end('You have authenticated')
 })
@@ -123,8 +124,6 @@ app.get('/oauthRedirect', (req, res) => {
 At this point, assuming the application is registered in the FusionAuth database and you have at least one user in that database (which you have to--you created one when you configured the FusionAuth server to be the admin, remember?), you can test what we've got. Run the NodeJS application (`node index.mjs`), [pop open a browser](http://localhost:3000) when that's started, and click the log in link. Fill in your admin creds, and assuming you typed everything correctly, "You are authenticated" should appear.
 
 (SCREENSHOT)
-
-***This ends the 5-minute intro***
 
 This is all great, but obviously it doesn't scale well: if everybody has to share the same credentials as our security administrator, something's going to break down pretty quickly. Let's add a (non-admin) user to the database.
 
@@ -146,4 +145,17 @@ So Fred seems to be in our database, fire up the browser, point it at [our home 
 
 In a later step, we'll talk about how to enable a "logout" link to allow us (and those users who are using a public/insecure browser, such as a public library or hotel's business center) to clear those settings, but for now, you can fire up an "incognito window" in your favorite browser and try again. Enter "fred" and "pebblesflintstone", and voila! Fred is now authenticated.
 
+## Dashboard: Wilma wants to join
+It's going to get complicated if we (the FusionAuth admin) have to add every single person who wants to use our awesome application, the way we added Fred, which is to say, by hand. When Wilma (Fred's wife) wants to join the app, we'll have to take time out of our day to add her, then tell her what password we've selected for her, and that'll get tedious if we have to do that very often. It would be far easier (for everybody) if we added a link by which prospective users could add themselves--and FusionAuth provides that capability, In fact, doing so requires zero code changes at all.
 
+Open up the Application in the FusionAuth Dashboard. Select the "Registration" page (between "Multi-Factor" and "SAML" there in the middle of the page). Under "Self-service Registration", do the following:
+
+* Set "Enabled" to on.
+* Set "Type" to Basic. Advanced is for using custom forms, and the Basic one that FusionAuth works just fine for our purposes.
+* Set "Confirm Password" to on. This is the typical "make the user type their password twice", to make sure they don't accidentally typo their intended password. Not obligatory, but frankly there's not much reason not to do this.
+* Set "Login type" to Username. While emails are guaranteed unique, sometimes usernames are the preferred way to go, particularly if we're not planning to email the user for anything.
+* Lastly, under "Registration fields", where we select which user-specific data we want to allow the user to enter and store, and which we want required, set them all to "Enabled" but leave "Required" off. This is mostly so that we can see what that form looks like without being obligated to enter in values for each and every field.
+
+Click "Save" in the upper-right, and browse (in another incognito window) to our home page again; this time, near the bottom, we are asked if we'd like to create a new account, and now Wilma can add herself to the app's list of registered users--and we didn't have to change a single line of code to support it. Auth-as-a-Service, for the win!
+
+But somewhat equally importantly, notice that the `userState` value we get back from FusionAuth after Wilma logs in is `Authenticated`, rather than `AuthenticatedNotRegistered` when we used our FusionAuth admin credentials. This is an interesting and important distinction when managing users across multiple applications, and you want to distinguish between those who are "registered" with the application and those who aren't (such as administrators doing behind-the-scenes work).

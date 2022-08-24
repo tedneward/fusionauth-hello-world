@@ -1,12 +1,8 @@
 import express from 'express'
 import fileSystem from 'fs'
-import { FusionAuthClient } from '@fusionauth/typescript-client'
 
 const clientId = 'f73b4062-e91c-4037-8027-246fa4786e67';
 const clientSecret = 'ahAscxuirNNjtXe0_lQFpn_Jc_0C6TyWhkdEhqgoAc8';
-
-const fusionAuthURL = 'http://localhost:9011';
-const client = new FusionAuthClient('noapikeyneeded', fusionAuthURL);
 
 const app = express()
 const port = 3000
@@ -32,12 +28,13 @@ app.get('/:page.html', (req, res) => {
 	});
 })
 app.get('/oauthRedirect', (req, res) => {
-	console.log('/oauth-redirect: code=', req.query['code'], 'userState=', req.query['userState'])
 	// What we get back:
 	// code: the authorization code
 	// userState: either Authenticated or AuthenticatedNotRegistered
 	let code = req.query['code']
 	let userState = req.query['userState']
+
+	console.log('/oauthRedirect: code=', code, 'userState=', userState)
 
 	res.end('You have authenticated')
 })
