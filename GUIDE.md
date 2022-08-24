@@ -1,9 +1,10 @@
 # A Guide to the Hello World of FusionAuth
-In this post, we're going to explore how to add authentication to your existing application using the FusionAuth system. Assuming you have already downloaded-and-configured FusionAuth on your local machine (downloads [here](https://fusionauth.io/download) if you haven't already; I prefer the Docker install since that requires the least amount of configuration on my part), we begin by looking at our existing, sample application.
+In this post, we're going to explore how to add authentication to your existing application using the FusionAuth system. Assuming you have already downloaded-and-configured FusionAuth on your local machine (downloads [here](https://fusionauth.io/download); I prefer the Docker install since that requires the least amount of configuration on my part), we begin by looking at our existing, sample application.
 
 And oh, boy, is it simple. It's a NodeJS application that doubles as a simple web server to present some HTML files when we need to:
 
 ```js
+// index.mjs
 import express from 'express'
 import fileSystem from 'fs'
 
