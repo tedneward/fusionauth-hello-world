@@ -51,6 +51,55 @@ We have a home page, which will present a login link:
 
 Normally, that would go to our home-grown authentication page, but we want to use FusionAuth to secure our authentication. FusionAuth will present a login screen, capture the user's password, and redirect back to our application when that's all done.
 
+## Setup: FusionAuth Dashboard
 In order to get that login link, we need to register an application with FusionAuth; fire up the FusionAuth dashboard by going [here](http://localhost:9011/admin/application/) (which will require that you log in to the dashboard first), and create an Application by clicking the "+" in the upper-right corner.
 
-The page that comes back is filled with a number of bells, whistles, and options. We want to keep it simple, though, so give the application a name (`hello-world` suffices for our purposes), and hit "Return". (The "Return" is necessary to create the application in the FusionAuth database.) When the application is created, FusionAuth will generate a GUID for the application's "client ID" (which we'll need in code in a second), but we have one more step we need to take--we need to specify a "redirect URL" target for FusionAuth to redirect to when the authentication step completes. That 
+The page that comes back is filled with a number of bells, whistles, and options. We want to keep it simple, though, so give the application a name (`hello-world` suffices for our purposes), and hit "Return". (The "Return" is necessary to create the application in the FusionAuth database.) When the application is created, FusionAuth will generate a GUID for the application's "client ID" (which we'll need in code in a second), but we have one more step we need to take--we need to specify a "redirect URL" target for FusionAuth to redirect to when the authentication step completes. That appears on the "OAuth" page in the Application page in the FusionAuth dashboard--first in the list below "Theme" in the Edit Application dashboard--in the entry field labeled "Authorized redirect URLs". This is the URL that FusionAuth will issue to the webserver when authentication is completed (successfully or not); we need to specify a URL that our NodeJS code will recognize and handle.
+
+Let's call it "oauthRedirect":
+
+```js
+app.get('/oauth-redirect', (req, res) => {
+	console.log('/oauthRedirect')
+})
+```
+
+and thus, put `http://localhost:3000/oauthRedirect` into that "Authorized redirect URLs" field in the Application page. Click the "Save" icon in the upper-right, and it takes us back to the main list of applications in the FusionAuth dashboard.
+
+## Setup: Capture client application info
+With that saved, FusionAuth can now give us the link we need to use to start the login process; from the Applications dashboard page, find the line with our application `hello-world` in it, and to the right, there is a 'View' icon that displays a number of interesting elements we'll need:
+
+(SCREENSHOT GOES HERE)
+
+Of the information displayed here, the parts we're going to need to satisfy our simplest-login-possible scneario is the `Client Id`, `Client Secret`, and `OAuth IdP login URL`. Keep that window open for a second--we'll want to cut-and-paste here in a second.
+
+## Code: Integrate the client application info
+The first two client info elements, client id and secret, go into the NodeJS code:
+
+```js
+// ...
+import fileSystem from 'fs'
+
+const clientId = 'f73b4062-e91c-4037-8027-246fa4786e67'
+const clientSecret = 'ahAscxuirNNjtXe0_lQFpn_Jc_0C6TyWhkdEhqgoAc8'
+
+const app = express()
+// ...
+```
+
+and the last we'll put into the `index.html`:
+
+```html
+<!doctype html>
+<html>
+    <title>FusionAuth: HelloWorld</title>
+	<body>
+		<p>Hello world! Welcome to our awesome application.</p>
+		<p>Please <a href="http://localhost:9011/oauth2/authorize?client_id=f73b4062-e91c-4037-8027-246fa4786e67&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2FoauthRedirect">log in</a> to enjoy the awesome.</p>
+	</body>
+</html>
+```
+
+> **SIDEBAR: Important safety tip!** Let's be very, *very* clear on something: One should never store secrets (like the `clientSecret`, above) directly in code--in addition to being vulnerable in the event your source code repository is ever obtained (assuming it's not open-source to start with!), you will want periodically to "rotate the keys"--that is, change the secret for the application--in case you have a breach, or just choose to do as part of your security policy. In this case, if the secret is part of the code, you'll need to do a code-deploy just to rotate keys, and that is potentially more work than you'd like. Normally, secrets like this would be stored as part of the environment rather than the code, such as an environment variable set in the Docker image, but since this is a simple example and never intended for production use, we can get away with using this code-stored secret. (Seriously, don't ever do this for code you care about. *Caveat emptor.*)
+
+## Code: Respond to the redirect
