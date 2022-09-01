@@ -1,9 +1,6 @@
 import express from 'express'
 import fileSystem from 'fs'
 
-const clientId = 'f73b4062-e91c-4037-8027-246fa4786e67';
-const clientSecret = 'ahAscxuirNNjtXe0_lQFpn_Jc_0C6TyWhkdEhqgoAc8';
-
 const app = express()
 const port = 3000
 
