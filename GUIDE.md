@@ -1,8 +1,8 @@
 # A Guide to the Hello World of FusionAuth
-In this post, we're going to explore how to add authentication to your existing application using the FusionAuth system. 
+In this post, we're going to explore how to add authentication to an existing Web application using the FusionAuth platform. We're going to keep things as simple as possible (but no simpler!) to keep the focus on how to secure an existing application, and how the features of FusionAuth help you do that.
 
-## Background
-We have a very simple existing application, one which provides just a couple of web pages:
+## Background: Our Awesome Application
+We have a very simple existing Web application, one which provides just a couple of web pages:
 
 * Home page
 * Secrets page (where sensitive stuff is kept and displayed)
@@ -147,7 +147,7 @@ Click the "Save" icon in the upper-right, and it takes us back to the main list 
 ## Setup: Capture login link
 With that saved, FusionAuth can now give us the link we need to use to start the login process; from the Applications dashboard page, find the line with our application `hello-world` in it, and to the right, there is a 'View' icon that displays a number of interesting elements we'll need:
 
-(SCREENSHOT GOES HERE)
+![](screenshots/hello-world-View.png)
 
 Of the information displayed here, the parts we're going to need to satisfy our simplest-login-possible scenario is the `OAuth IdP login URL`. ("IdP" is a shorthand acronym for "identity provider", the server that handles the authentication, e.g., FusionAuth.) Keep that window open for a second--we'll want to cut-and-paste here in a second.
 
@@ -165,7 +165,7 @@ From that "IdP login URL" field, copy and paste the URL into `index.html`, like 
 </html>
 ```
 
-Really, that's it for the login page.
+That's it for the login page itself.
 
 ## Code: Respond to the redirect
 When the user clicks that "log in" link, FusionAuth takes over and presents the page that contains the form asking for username and password. Assuming the user enters the credentials correctly, FA will then send a "code" and "userState" values to your URL of choice--that's what we entered in the "OAuth Redirect" field earlier. We can capture those values and do something with them, but for now it's sufficient to simply display that we got them:
@@ -193,6 +193,8 @@ Lastly, one of the classic mistakes developers make is to do the "happy path" te
 
 ## Code: Keep out the unauthenticated
 If you take a moment right now to browse to our [secret page](http://localhost:3000/secrets.html), you'll see pretty quickly that it doesn't matter whether we've authenticated to the application or not, we can still see the secrets. Not great!
+
+Typically, we secure pages and resources from the back-end, 
 
 ## Dashboard: Add a User
 This is all great, but obviously it doesn't scale well: if everybody has to share the same credentials as our security administrator, something's going to break down pretty quickly. Let's add a (non-admin) user to the database.
