@@ -24,7 +24,7 @@ app.get('/:page.html', (req, res) => {
 		}
 	});
 })
-app.get('/oauthRedirect', (req, res) => {
+app.get('/oauth-redirect', (req, res) => {
 	// What we get back:
 	// code: the authorization code
 	// userState: either Authenticated or AuthenticatedNotRegistered
